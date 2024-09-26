@@ -5,6 +5,7 @@ set -e
 HEALTHCHECK_TIMEOUT=60
 NO_HEALTHCHECK_TIMEOUT=10
 WAIT_AFTER_HEALTHY_DELAY=0
+AFTER_SUCCESS_CHECK_HOOK=""
 
 # Print metadata for Docker CLI plugin
 if [ "$1" = "docker-cli-plugin-metadata" ]; then
@@ -132,6 +133,11 @@ main() {
 
       exit 1
     fi
+
+    if [ -n "$AFTER_SUCCESS_CHECK_HOOK" ]; then
+      echo "==> Executing AFTER_SUCCESS_CHECK_HOOK with old container IDs: $OLD_CONTAINER_IDS"
+      $AFTER_SUCCESS_CHECK_HOOK $OLD_CONTAINER_IDS
+    fi
     
     if [ "$WAIT_AFTER_HEALTHY_DELAY" != "0" ]; then
       echo "==> Waiting for healthy containers to settle down ($WAIT_AFTER_HEALTHY_DELAY seconds)"
@@ -174,6 +180,10 @@ while [ $# -gt 0 ]; do
     ;;
   --wait-after-healthy)
     WAIT_AFTER_HEALTHY_DELAY="$2"
+    shift 2
+    ;;
+  --after-success-check-hook)
+    AFTER_SUCCESS_CHECK_HOOK="$2"
     shift 2
     ;;
   -*)
