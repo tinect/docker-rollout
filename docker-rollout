@@ -133,14 +133,16 @@ main() {
 
       exit 1
     fi
+    
+    if [ "$WAIT_AFTER_HEALTHY_DELAY" != "0" ]; then
+      echo "==> Waiting for healthy containers to settle down ($WAIT_AFTER_HEALTHY_DELAY seconds)"
+      sleep $WAIT_AFTER_HEALTHY_DELAY
+    fi
 
     if [ -n "$AFTER_SUCCESS_CHECK_HOOK" ]; then
       echo "==> Executing AFTER_SUCCESS_CHECK_HOOK with old container IDs: $OLD_CONTAINER_IDS"
       $AFTER_SUCCESS_CHECK_HOOK $OLD_CONTAINER_IDS
-    fi
-    
-    if [ "$WAIT_AFTER_HEALTHY_DELAY" != "0" ]; then
-      echo "==> Waiting for healthy containers to settle down ($WAIT_AFTER_HEALTHY_DELAY seconds)"
+
       sleep $WAIT_AFTER_HEALTHY_DELAY
     fi
   else
